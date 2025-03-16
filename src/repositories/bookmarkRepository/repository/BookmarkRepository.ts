@@ -32,5 +32,5 @@ class BookmarkRepository extends BaseRepository {
         return this.delete<void>(`/api/bookmarks/${id}`);
     }
 } 
-
 export const bookmarkRepository = new BookmarkRepository();
+
