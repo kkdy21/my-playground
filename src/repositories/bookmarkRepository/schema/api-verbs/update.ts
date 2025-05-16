@@ -1,6 +1,6 @@
-import type {BookmarkResponse} from "../model.ts";
+import type { BookmarkDTO } from "../../types.ts";
 
-export interface BookmarkUpdateParameters{
-    bookmarkId : string;
-    bookmark : Partial<Omit<BookmarkResponse, 'id' | 'createdAt' | 'updatedAt'>>
+export interface BookmarkUpdateParameters {
+  bookmarkId: string;
+  bookmark: Partial<Omit<BookmarkDTO, "id" | "createdAt" | "updatedAt">>;
 }
