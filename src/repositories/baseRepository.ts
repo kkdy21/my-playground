@@ -3,7 +3,7 @@ import ServiceAPI from "../libs/serviceAPI.ts";
 export default class BaseRepository {
   private serviceAPI: ServiceAPI;
   //TODO Mock 관련 한 클래스
-  constructor(baseURL: string = "http://localhost:8080") {
+  constructor(baseURL: string = "http://localhost:5174") {
     this.serviceAPI = new ServiceAPI(baseURL);
   }
 

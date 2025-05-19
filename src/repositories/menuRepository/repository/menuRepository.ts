@@ -4,7 +4,7 @@ import type { IMenuRepository } from "./IMenuRepository";
 
 class MenuRepository extends BaseRepository implements IMenuRepository {
   async getMenuList(): Promise<MenuDTO[]> {
-    return this.get<MenuDTO[]>(`/api/menu/`);
+    return this.get<MenuDTO[]>(`/api/menu`);
   }
 }
 

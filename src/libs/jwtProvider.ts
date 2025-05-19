@@ -12,7 +12,7 @@ interface IJwt {
 const url = import.meta.env.VITE_BACKEND_ENDPOINT;
 
 export default class JwtProvider {
-   private static tokenProvider: JwtProvider | null = null;
+  private static tokenProvider: JwtProvider | null = null;
   private localStorage: StorageConnector = localStorageAccessor;
   private sessionStorage: StorageConnector = sessionStorageAccessor;
   private REFRESH_TOKEN_URL = "auth/refresh";

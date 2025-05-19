@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { menuRepository } from "@/repositories/menuRepository/repository/menuRepository";
 import type { MenuDTO } from "@/repositories/menuRepository/schema/dto/menuDTO";
-import type { MenuDTOModel } from "@/repositories/menuRepository/model/menuDTOModel";
+import type { MenuEntity } from "@/repositories/menuRepository/entity/menuEntity";
+import { MenuMapper } from "../mapper/menuMapper";
 
 export const MENU_KEYS = {
   all: ["menu"],
@@ -10,9 +11,10 @@ export const MENU_KEYS = {
     [...MENU_KEYS.lists(), filters] as const,
 } as const;
 
-export const useMenu = (filters: { role?: string } = {}) => {
-  return useQuery<MenuDTO[], Error, MenuDTOModel[]>({
+export const useGetMenu = (filters: { role?: string } = {}) => {
+  return useQuery<MenuDTO[], Error, MenuEntity[]>({
     queryKey: MENU_KEYS.list(filters),
     queryFn: async () => await menuRepository.getMenuList(),
+    select: (data) => MenuMapper.toMenuEntities(data),
   });
 };
