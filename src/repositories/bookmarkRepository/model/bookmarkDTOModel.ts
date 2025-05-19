@@ -1,6 +1,4 @@
-//DTOmodel은 프론트엔드에서 사용할 데이터 타입
-
-import { BOOKMARK_TYPE } from "../constants";
+import type { BookmarkValue } from "../constants";
 
 export type BookmarkDTOModel = {
   id: string;
@@ -8,6 +6,6 @@ export type BookmarkDTOModel = {
   link: string;
   createdAt: Date;
   updatedAt: Date;
-  bookmarkType: BOOKMARK_TYPE;
+  bookmarkType: BookmarkValue;
   description: string;
 };

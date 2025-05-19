@@ -1,4 +1,6 @@
-import type { BookmarkDTO } from "../../types.ts";
-export interface BookmarkCreateParameters {
-  bookmark: Omit<BookmarkDTO, "id" | "createdAt" | "updatedAt">;
-}
+import type { BookmarkDTO } from "@/repositories/bookmarkRepository/schema/dto/bookmarkDTO";
+
+export type BookmarkCreateParameters = Omit<
+  BookmarkDTO,
+  "id" | "createdAt" | "updatedAt"
+>;

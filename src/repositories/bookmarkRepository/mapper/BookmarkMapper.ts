@@ -1,8 +1,8 @@
-import type { BookmarkDTOModel } from "../schema/model.ts";
-import type { BookmarkDTO } from "../types.ts";
+import type { BookmarkDTOModel } from "../model/bookmarkDTOModel";
+import type { BookmarkDTO } from "../schema/dto/bookmarkDTO";
 
 export class BookmarkMapper {
-  static toBookmark(response: BookmarkDTO): BookmarkDTOModel {
+  static toBookmarkDTOModel(response: BookmarkDTO): BookmarkDTOModel {
     return {
       id: response.id,
       name: response.title,
@@ -14,7 +14,7 @@ export class BookmarkMapper {
     };
   }
 
-  static toBookmarks(responses: BookmarkDTO[]): BookmarkDTOModel[] {
-    return responses.map((response) => this.toBookmark(response));
+  static toBookmarkDTOModels(responses: BookmarkDTO[]): BookmarkDTOModel[] {
+    return responses.map((response) => this.toBookmarkDTOModel(response));
   }
 }

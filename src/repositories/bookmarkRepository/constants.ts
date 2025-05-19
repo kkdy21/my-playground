@@ -1,7 +1,12 @@
+import { createKeyValidator } from "@/types/keyTypeValidator";
+
 const BOOKMARK_TYPE = {
   ADMIN: "admin",
   WORKSPACE: "workspace",
   USER: "user",
 } as const;
 
-export type BOOKMARK_TYPE = (typeof BOOKMARK_TYPE)[keyof typeof BOOKMARK_TYPE];
+export type BookmarkKey = keyof typeof BOOKMARK_TYPE;
+export type BookmarkValue = (typeof BOOKMARK_TYPE)[BookmarkKey];
+
+export const isBookmarkType = createKeyValidator(BOOKMARK_TYPE);

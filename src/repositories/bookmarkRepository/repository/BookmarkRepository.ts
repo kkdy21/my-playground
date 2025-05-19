@@ -1,12 +1,14 @@
-import BaseRepository from "../../baseRepository.ts";
+import BaseRepository from "@/repositories/baseRepository.ts";
 import type {
   BookmarkGetListParameters,
   BookmarkGetParameters,
-} from "../schema/api-verbs/get.ts";
-import type { BookmarkCreateParameters } from "../schema/api-verbs/create.ts";
-import type { BookmarkUpdateParameters } from "../schema/api-verbs/update.ts";
-import type { BookmarkDTO } from "../types.ts";
-class BookmarkRepository extends BaseRepository {
+} from "@/repositories/bookmarkRepository/schema/api-verbs/get.ts";
+import type { BookmarkCreateParameters } from "@/repositories/bookmarkRepository/schema/api-verbs/create.ts";
+import type { BookmarkUpdateParameters } from "@/repositories/bookmarkRepository/schema/api-verbs/update.ts";
+import type { BookmarkDTO } from "@/repositories/bookmarkRepository/schema/dto/bookmarkDTO";
+import type { IBookmarkRepository } from "./IBookmarkRepository";
+
+class BookmarkRepository extends BaseRepository implements IBookmarkRepository {
   async getBookmarks(
     reqParams?: BookmarkGetListParameters
   ): Promise<BookmarkDTO[]> {

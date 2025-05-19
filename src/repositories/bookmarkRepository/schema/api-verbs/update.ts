@@ -1,4 +1,4 @@
-import type { BookmarkDTO } from "../../types.ts";
+import type { BookmarkDTO } from "@/repositories/bookmarkRepository/schema/dto/bookmarkDTO";
 
 export interface BookmarkUpdateParameters {
   bookmarkId: string;

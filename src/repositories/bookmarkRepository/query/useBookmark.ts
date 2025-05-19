@@ -1,8 +1,8 @@
 import { BookmarkMapper } from "../mapper/bookmarkMapper.ts";
 import { referenceRepository } from "../../referenceRepository.ts";
 import { useQuery } from "@tanstack/react-query";
-import type { BookmarkDTOModel } from "../schema/model.ts";
-import type { BookmarkDTO } from "../types.ts";
+import type { BookmarkDTO } from "@/repositories/bookmarkRepository/schema/model";
+import type { BookmarkDTOModel } from "@/repositories/bookmarkRepository/types.ts";
 
 // react query hook을 server state로 사용하는 방식을 채택, select함수를 통해 response를 model로 변환하는 방식생각.
 export const BOOKMARK_KEYS = {
@@ -19,7 +19,7 @@ export const useBookmark = (id: string) => {
     queryKey: BOOKMARK_KEYS.detail(id),
     queryFn: async () =>
       await referenceRepository.bookmark.getBookmark({ bookMark_id: id }),
-    select: (data) => BookmarkMapper.toBookmark(data),
+    select: (data) => BookmarkMapper.toBookmarkDTOModel(data),
     enabled: !!id,
   });
 };

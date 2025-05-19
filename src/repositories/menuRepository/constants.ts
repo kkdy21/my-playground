@@ -6,12 +6,12 @@
  * 이를 위해 재사용 가능한 validator 함수 (createKeyValidator) 도입
  */
 
-import { createKeyValidator } from "../../types/keyValidator";
+import { createKeyValidator } from "@/types/keyTypeValidator";
 
 export const Roles = {
-    ADMIN: "admin",
-    USER: "user",
-    GUEST: "guest",
+  ADMIN: "admin",
+  USER: "user",
+  GUEST: "guest",
 } as const;
 
 export type RoleKey = keyof typeof Roles;
@@ -19,12 +19,3 @@ export type RoleValue = (typeof Roles)[RoleKey];
 
 // Roles에 대한 유효성 검사기
 export const isValidRoleKey = createKeyValidator(Roles);
-
-// 사용 예시
-    // if (isValidRoleKey(roleKeyInput)) {
-    //     // 여기서 roleKeyInput의 타입은 "ADMIN" | "USER" | "GUEST" (RoleKey)로 좁혀짐
-    //     console.log(`Valid role key: ${roleKeyInput}, Value: ${Roles[roleKeyInput]}`);
-    // } else {
-    //     console.log(`Invalid role key: ${roleKeyInput}`);
-    // }
-
