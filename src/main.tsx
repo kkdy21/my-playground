@@ -3,9 +3,9 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { mswProvider } from "@/libs/msw/mswProvider.ts";
+import { mswController } from "./libs/msw/mswControl.ts";
 
-await mswProvider.start();
+await mswController.start();
 
 const queryClient = new QueryClient({
   defaultOptions: {

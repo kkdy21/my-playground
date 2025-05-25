@@ -1,13 +1,7 @@
 /*
     MSW 핸들러 정보 타입 정의
 */
-
-export interface MockHandlerInfo {
-  groupName: string;
-  id: string;
-  description: string;
-  isEnabled: boolean;
-}
+export type HandlerEnabledState = Record<string, boolean>;
 
 declare global {
   interface Window {
@@ -22,15 +16,7 @@ declare global {
       saveConfigToLocalStorage: () => Promise<void>;
       loadConfigFromLocalStorage: () => Promise<void>;
       resetToInitialCodeConfig: () => Promise<void>;
+      isWorkerRunning: () => boolean;
     };
   }
 }
-
-//FIXME 글로벌하게 사용하는 방법? d.ts 파일에 정의하는 것이 맞는지?
-export interface MockHandlerItem {
-  id: string;
-  description: string;
-  handler: RequestHandler;
-}
-
-export type HandlerEnabledState = Record<string, boolean>;

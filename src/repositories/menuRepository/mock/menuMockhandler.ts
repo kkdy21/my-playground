@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type { MenuDTO } from "../schema/dto/menuDTO";
-import type { MockHandlerItem } from "@/types/msw";
+import type { MockHandlerItem } from "@/libs/msw/types";
 
 /*
   개별 핸들러에 ID를 부여하고 객체형태로 관리.

@@ -1,0 +1,421 @@
+// src/libs/msw/mswControl.ts (예시 파일명)
+
+import { type SetupWorker, setupWorker } from "msw/browser";
+import type { RequestHandler } from "msw";
+import { localStorageAccessor, STORAGE_KEYS } from "../webStorage"; // webStorage.ts 경로에 맞게 수정 필요
+import { allMockHandlerInfoGroups } from "./mswHandlers"; //
+import type { MockHandlerInfo } from "@/libs/msw/types"; // msw.d.ts 경로에 맞게 수정 필요
+import { BOOKMARK_HANDLER_IDS } from "@/repositories/bookmarkRepository/mock/bookmarkMockhandler"; //
+import { MENU_HANDLER_IDS } from "@/repositories/menuRepository/mock/menuMockhandler"; //
+import type { HandlerEnabledState } from "@/types/msw";
+
+//FIXME allMockHandlerInfoGroups와 연관성 생각해야함. allMockHandlerInfoGroups에 정의안되어있고 여기에만 정의되어있을수도있으므로
+// allMockHandlerInfoGroups의 존재이유를 다시 생각해봐야함.
+
+// --- 초기 핸들러 상태 정의 --- //FIXME 초기 상태 정의 방법 고민 -> mock 파일별로 관리 방법으로 전환.
+const initialHandlerStates: HandlerEnabledState = {
+  [BOOKMARK_HANDLER_IDS.GET_BOOKMARK_BY_ID]: true,
+  [BOOKMARK_HANDLER_IDS.CREATE_BOOKMARK]: true,
+  [BOOKMARK_HANDLER_IDS.UPDATE_BOOKMARK]: true,
+  [BOOKMARK_HANDLER_IDS.DELETE_BOOKMARK]: true,
+  [BOOKMARK_HANDLER_IDS.GET_BOOKMARKS]: true,
+  [MENU_HANDLER_IDS.GET_MENU_LIST]: true,
+  // 추가 핸들러 ID와 초기 상태
+};
+
+class MSWController {
+  private worker: SetupWorker | null = null;
+  private runtimeHandlerConfig: HandlerEnabledState = {
+    ...initialHandlerStates,
+  };
+  private configInitialized = false; // 전체 설정 및 콘솔 인터페이스 초기화 여부
+  private mswWorkerStarted = false; // 순수 MSW 워커 시작 여부
+
+  constructor() {
+    // 개발 환경에서만 window.mswControl 설정
+    if (process.env.NODE_ENV === "development") {
+      this.initializeRuntimeConfig(); // 생성자에서 설정 초기화
+      this.exposeControlToWindow();
+    }
+  }
+
+  // --- 설정 관리 로직  ---
+  private initializeRuntimeConfig(): void {
+    if (this.configInitialized || process.env.NODE_ENV !== "development") {
+      return;
+    }
+
+    const storedConfig = localStorageAccessor.getItem<string>(
+      STORAGE_KEYS.MSW_HANDLER_CONFIG
+    );
+
+    if (storedConfig) {
+      try {
+        const parsedConfig = JSON.parse(storedConfig) as HandlerEnabledState;
+        Object.keys(initialHandlerStates).forEach((id) => {
+          if (
+            Object.prototype.hasOwnProperty.call(parsedConfig, id) &&
+            typeof parsedConfig[id] === "boolean"
+          ) {
+            this.runtimeHandlerConfig[id] = parsedConfig[id];
+          } else {
+            this.runtimeHandlerConfig[id] = initialHandlerStates[id];
+          }
+        });
+        console.log(
+          "[MSW Controller] localStorage에서 런타임 설정을 로드했습니다:",
+          this.runtimeHandlerConfig
+        );
+      } catch (e) {
+        console.warn(
+          "[MSW Controller] localStorage 설정 파싱 실패. 코드 레벨 초기값을 사용합니다.",
+          e
+        );
+        this.runtimeHandlerConfig = { ...initialHandlerStates };
+      }
+    } else {
+      this.runtimeHandlerConfig = { ...initialHandlerStates };
+      console.log(
+        "[MSW Controller] 코드 레벨 초기값으로 런타임 설정을 초기화했습니다:",
+        this.runtimeHandlerConfig
+      );
+    }
+    // 초기화된 설정을 바로 localStorage에 저장
+    localStorageAccessor.setItem(
+      STORAGE_KEYS.MSW_HANDLER_CONFIG,
+      JSON.stringify(this.runtimeHandlerConfig)
+    );
+    this.configInitialized = true;
+  }
+
+  private isHandlerEnabled(handlerId: string): boolean {
+    if (process.env.NODE_ENV !== "development") return false;
+    // configInitialized 체크는 생성자에서 initializeRuntimeConfig를 호출하므로,
+    // 대부분의 공개 메서드 호출 시점에는 true일 것으로 예상됨.
+    // 만약 초기화 전 접근 시도를 더 엄격히 제어하려면 각 공개 메서드 시작 시 체크.
+    if (!this.configInitialized) {
+      // 아직 초기화 전이라면 코드 레벨의 기본값을 반환
+      return initialHandlerStates[handlerId] === undefined
+        ? true
+        : initialHandlerStates[handlerId];
+    }
+    return typeof this.runtimeHandlerConfig[handlerId] === "boolean"
+      ? this.runtimeHandlerConfig[handlerId]
+      : initialHandlerStates[handlerId]; // runtime에 없으면 코드 레벨 초기값 참조
+  }
+
+  private setHandlerEnabled(handlerId: string, enabled: boolean): void {
+    if (process.env.NODE_ENV !== "development") return;
+    if (!this.configInitialized) {
+      console.warn(
+        "[MSW Controller] 아직 초기화되지 않아 설정을 변경할 수 없습니다."
+      );
+      return;
+    }
+    if (
+      Object.prototype.hasOwnProperty.call(this.runtimeHandlerConfig, handlerId)
+    ) {
+      this.runtimeHandlerConfig[handlerId] = enabled;
+      localStorageAccessor.setItem(
+        STORAGE_KEYS.MSW_HANDLER_CONFIG,
+        JSON.stringify(this.runtimeHandlerConfig)
+      );
+    } else {
+      console.warn(
+        `[MSW Controller] 알 수 없는 핸들러 ID '${handlerId}'의 상태를 변경할 수 없습니다.`
+      );
+    }
+  }
+
+  private getConfiguredRequestHandlers(): RequestHandler[] {
+    const activeRequestHandlers: RequestHandler[] = [];
+    if (process.env.NODE_ENV !== "development") return activeRequestHandlers;
+    if (!this.configInitialized) {
+      console.warn(
+        "[MSW Controller] 아직 초기화되지 않아 핸들러 목록을 가져올 수 없습니다."
+      );
+      return [];
+    }
+
+    Object.values(allMockHandlerInfoGroups).forEach((apiGroupHandlers) => {
+      //
+      Object.values(apiGroupHandlers).forEach((handlerInfo) => {
+        if (this.isHandlerEnabled(handlerInfo.id)) {
+          activeRequestHandlers.push(handlerInfo.handler);
+        }
+      });
+    });
+    return activeRequestHandlers;
+  }
+
+  private _getAllHandlerDetailsForConsole(): MockHandlerInfo[] {
+    const details: MockHandlerInfo[] = [];
+    if (process.env.NODE_ENV !== "development") return details;
+
+    const sourceConfig = this.configInitialized
+      ? this.runtimeHandlerConfig
+      : initialHandlerStates;
+
+    Object.entries(allMockHandlerInfoGroups).forEach(
+      ([groupName, handlers]) => {
+        //
+        Object.values(handlers).forEach((handlerInfo) => {
+          details.push({
+            groupName,
+            id: handlerInfo.id,
+            description: handlerInfo.description,
+            isEnabled:
+              typeof sourceConfig[handlerInfo.id] === "boolean"
+                ? sourceConfig[handlerInfo.id]
+                : initialHandlerStates[handlerInfo.id] || false,
+          });
+        });
+      }
+    );
+    return details.sort((a, b) => {
+      if (a.groupName !== b.groupName)
+        return a.groupName.localeCompare(b.groupName);
+      return a.description.localeCompare(b.description);
+    });
+  }
+
+  async start(): Promise<void> {
+    if (this.mswWorkerStarted) {
+      console.log("[MSW Controller] 워커가 이미 시작된 상태입니다.");
+      return;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      // initializeRuntimeConfig는 생성자에서 호출되므로 여기서는 ensure 정도로만.
+      if (!this.configInitialized) this.initializeRuntimeConfig();
+
+      const activeHandlers = this.getConfiguredRequestHandlers();
+
+      if (activeHandlers.length === 0) {
+        console.log(
+          "[MSW Controller] 활성화된 핸들러가 없습니다. MSW 워커를 시작하지 않습니다."
+        );
+        this.worker = null; // 명시적으로 null
+        this.mswWorkerStarted = false;
+        if (window.mswControl) {
+          console.log(
+            "[MSW Control] 'mswControl.enableHandler(\"핸들러ID\")' 또는 'mswControl.enableAllHandlers()'로 핸들러를 활성화할 수 있습니다."
+          );
+        }
+        return;
+      }
+
+      try {
+        this.worker = setupWorker(...activeHandlers);
+        await this.worker.start({
+          onUnhandledRequest: "bypass",
+        });
+        this.mswWorkerStarted = true;
+        console.log(
+          `[MSW Controller] 워커 시작됨 (${activeHandlers.length}개 핸들러 활성화).`
+        );
+      } catch (error) {
+        console.error("[MSW Controller] MSW 워커 시작 실패:", error);
+        this.worker = null;
+        this.mswWorkerStarted = false;
+      }
+    }
+  }
+
+  async stop(): Promise<void> {
+    if (this.worker) {
+      await this.worker.stop();
+      this.worker = null;
+      this.mswWorkerStarted = false;
+      console.log("[MSW Controller] 워커가 중지되었습니다.");
+    }
+  }
+
+  async reinitialize(): Promise<void> {
+    if (process.env.NODE_ENV !== "development") return;
+    console.log("[MSW Controller] 워커 재초기화 중...");
+    await this.stop();
+    await this.start(); // 내부적으로 getConfiguredRequestHandlers를 호출하여 최신 설정 반영
+    if (this.mswWorkerStarted) {
+      console.log("[MSW Controller] 워커 재초기화 완료.");
+    } else {
+      // start 메서드에서 이미 로그를 남기므로, 여기서는 추가 로그가 필요 없을 수 있음
+      console.log(
+        "[MSW Controller] 재초기화 후 워커가 시작되지 않음 (활성화된 핸들러가 없을 수 있음)."
+      );
+    }
+  }
+
+  isWorkerRunning(): boolean {
+    return this.worker !== null && this.mswWorkerStarted;
+  }
+
+  // --- 콘솔 인터페이스 노출 로직 ---
+  private exposeControlToWindow(): void {
+    if (process.env.NODE_ENV !== "development") return;
+
+    const mswControlObject = {
+      enableHandler: async (handlerId: string) => {
+        if (!this.configInitialized) {
+          this.initializeRuntimeConfig();
+        }
+        const handlerInfo = this._getAllHandlerDetailsForConsole().find(
+          (d) => d.id === handlerId
+        );
+        if (!handlerInfo) {
+          console.warn(
+            `[MSW Control] 핸들러 ID '${handlerId}'를 찾을 수 없습니다.`
+          );
+          return;
+        }
+        this.setHandlerEnabled(handlerId, true);
+        console.log(
+          `[MSW Control] 핸들러 '${handlerInfo.description}' (ID: ${handlerId}) 활성화됨. MSW 재초기화 중...`
+        );
+        await this.reinitialize();
+        console.log(`[MSW Control] MSW 재초기화 완료.`);
+      },
+      disableHandler: async (handlerId: string) => {
+        if (!this.configInitialized) {
+          this.initializeRuntimeConfig();
+        }
+        const handlerInfo = this._getAllHandlerDetailsForConsole().find(
+          (d) => d.id === handlerId
+        );
+        if (!handlerInfo) {
+          console.warn(
+            `[MSW Control] 핸들러 ID '${handlerId}'를 찾을 수 없습니다.`
+          );
+          return;
+        }
+        this.setHandlerEnabled(handlerId, false);
+        console.log(
+          `[MSW Control] 핸들러 '${handlerInfo.description}' (ID: ${handlerId}) 비활성화됨. MSW 재초기화 중...`
+        );
+        await this.reinitialize();
+        console.log(`[MSW Control] MSW 재초기화 완료.`);
+      },
+      isHandlerEnabled: (handlerId: string) => {
+        if (!this.configInitialized) {
+          this.initializeRuntimeConfig();
+        }
+        const handlerInfo = this._getAllHandlerDetailsForConsole().find(
+          (d) => d.id === handlerId
+        );
+        if (!handlerInfo) {
+          console.warn(
+            `[MSW Control] 핸들러 ID '${handlerId}'를 찾을 수 없습니다.`
+          );
+          return undefined;
+        }
+        const enabled = this.isHandlerEnabled(handlerId); // 클래스 내부 메서드 사용
+        console.log(
+          `[MSW Control] 핸들러 '${
+            handlerInfo.description
+          }' (ID: ${handlerId}) 상태: ${enabled ? "활성화됨" : "비활성화됨"}`
+        );
+        return enabled;
+      },
+      listHandlers: () => {
+        if (!this.configInitialized) {
+          this.initializeRuntimeConfig();
+        }
+        console.log(
+          "[MSW Control] 사용 가능한 핸들러 목록 (ID | 상태 | 설명):"
+        );
+        const details = this._getAllHandlerDetailsForConsole();
+        if (details.length === 0) {
+          console.log("  (표시할 핸들러가 없습니다.)");
+          return;
+        }
+        details.forEach((detail) => {
+          console.log(
+            `  - ${detail.id.padEnd(15, " ")} | ${
+              detail.isEnabled ? "ON " : "OFF"
+            } | ${detail.description} (그룹: ${detail.groupName})`
+          );
+        });
+      },
+      enableAllHandlers: async () => {
+        if (!this.configInitialized) {
+          this.initializeRuntimeConfig();
+        }
+        console.log("[MSW Control] 모든 핸들러 활성화 중...");
+        Object.keys(this.runtimeHandlerConfig).forEach((id) =>
+          this.setHandlerEnabled(id, true)
+        );
+        await this.reinitialize();
+        console.log("[MSW Control] 모든 핸들러 활성화 및 MSW 재초기화 완료.");
+      },
+      disableAllHandlers: async () => {
+        if (!this.configInitialized) {
+          this.initializeRuntimeConfig();
+        }
+        console.log("[MSW Control] 모든 핸들러 비활성화 중...");
+        Object.keys(this.runtimeHandlerConfig).forEach((id) =>
+          this.setHandlerEnabled(id, false)
+        );
+        await this.reinitialize();
+        console.log("[MSW Control] 모든 핸들러 비활성화 및 MSW 재초기화 완료.");
+      },
+      getCurrentConfig: () => {
+        if (!this.configInitialized) {
+          this.initializeRuntimeConfig();
+        }
+        console.log(
+          "[MSW Control] 현재 적용된 핸들러 설정 (메모리 기준):",
+          this.runtimeHandlerConfig
+        );
+        return { ...this.runtimeHandlerConfig };
+      },
+      saveConfigToLocalStorage: async () => {
+        if (!this.configInitialized) {
+          this.initializeRuntimeConfig();
+        }
+        await localStorageAccessor.setItem(
+          STORAGE_KEYS.MSW_HANDLER_CONFIG,
+          JSON.stringify(this.runtimeHandlerConfig)
+        );
+        console.log(
+          "[MSW Control] 현재 핸들러 설정을 localStorage에 저장했습니다.",
+          this.runtimeHandlerConfig
+        );
+      },
+      loadConfigFromLocalStorage: async () => {
+        console.log("[MSW Control] localStorage에서 설정 재로드 시도 중...");
+        this.configInitialized = false; // 강제 재로드 플래그
+        this.initializeRuntimeConfig(); // localStorage 우선 로드 로직 실행
+        console.log(
+          "[MSW Control] 설정 재로드 완료. 'mswControl.listHandlers()'로 확인하세요."
+        );
+        await this.reinitialize();
+      },
+      resetToInitialCodeConfig: async () => {
+        console.log("[MSW Control] 코드 레벨 초기 설정으로 리셋 중...");
+        this.runtimeHandlerConfig = { ...initialHandlerStates };
+        localStorageAccessor.setItem(
+          STORAGE_KEYS.MSW_HANDLER_CONFIG,
+          JSON.stringify(this.runtimeHandlerConfig)
+        );
+        this.configInitialized = true; // 이미 초기화된 것으로 간주 (initialHandlerStates로)
+        console.log(
+          "[MSW Control] 코드 레벨 초기 설정으로 리셋 완료:",
+          this.runtimeHandlerConfig
+        );
+        await this.reinitialize();
+      },
+      isWorkerRunning: () => {
+        const running = this.isWorkerRunning(); // 클래스 내부 메서드 사용
+        console.log(`[MSW Control] 워커 실행 상태: ${running}`);
+        return running;
+      },
+    };
+    window.mswControl = mswControlObject;
+    console.log(
+      "[MSW Controller] 콘솔에서 'mswControl.listHandlers()'를 입력하여 사용 가능한 핸들러를 확인하세요."
+    );
+  }
+}
+
+// 싱글톤 인스턴스 생성 및 내보내기
+export const mswController = new MSWController();

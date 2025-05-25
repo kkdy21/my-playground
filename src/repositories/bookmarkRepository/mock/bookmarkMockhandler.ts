@@ -1,6 +1,6 @@
 // src/repositories/bookmarkRepository/mock/bookmarkMockhandler.ts
 import type { BookmarkDTO } from "@/repositories/bookmarkRepository/schema/dto/bookmarkDTO";
-import type { MockHandlerItem } from "@/types/msw";
+import type { MockHandlerItem } from "@/libs/msw/types";
 import { http, HttpResponse } from "msw";
 
 // 핸들러 ID 상수 정의
