@@ -186,7 +186,6 @@ async function resolveMainClient(event) {
 
 async function getResponse(event, client, requestId) {
   const { request } = event;
-  console.log(request);
 
   // Clone the request because it might've been already used
   // (i.e. its body has been read and sent to the client).

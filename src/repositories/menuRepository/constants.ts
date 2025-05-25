@@ -6,7 +6,7 @@
  * 이를 위해 재사용 가능한 validator 함수 (createKeyValidator) 도입
  */
 
-import { createKeyValidator } from "@/types/keyTypeValidator";
+import { createKeyValidator } from "@/utils/keyTypeValidator";
 
 export const ROLES = {
   ADMIN: "ADMIN",

@@ -1,12 +1,13 @@
 import { isNullOrUndefined } from "../utils/isNullOrUndefined.ts";
 
 // eslint-disable-next-line
-const STORAGE = {
+export const STORAGE_KEYS = {
   ACCESS_TOKEN: "access_token",
   REFRESH_TOKEN: "refresh_token",
+  MSW_HANDLER_CONFIG: "msw_handler_config",
 } as const;
 
-type StorageKeyType = (typeof STORAGE)[keyof typeof STORAGE];
+type StorageKeyType = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
 
 export class StorageConnector {
   private storage: Storage;
@@ -15,7 +16,7 @@ export class StorageConnector {
     this.storage = storage;
   }
 
-  setItem(key: StorageKeyType, value: any) {
+  setItem<T>(key: StorageKeyType, value: T) {
     if (value !== null && value !== undefined) {
       const saveValue = JSON.stringify(value);
       this.storage.setItem(key, saveValue);

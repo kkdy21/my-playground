@@ -1,4 +1,4 @@
-import { createKeyValidator } from "@/types/keyTypeValidator";
+import { createKeyValidator } from "@/utils/keyTypeValidator";
 
 const BOOKMARK_TYPE = {
   ADMIN: "admin",
