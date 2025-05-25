@@ -1,6 +1,6 @@
 import type { MenuDTO } from "../schema/dto/menuDTO";
 import type { MenuEntity } from "../entity/menuEntity";
-import { isValidRoleKey } from "../constants";
+import { isValidRole } from "../constants";
 
 export class MenuMapper {
   static toMenuEntity(menu: MenuDTO): MenuEntity {
@@ -10,7 +10,7 @@ export class MenuMapper {
       path: menu.path,
       icon: menu.icon,
       children: menu.children.map((child) => this.toMenuEntity(child)),
-      role: isValidRoleKey(menu.role) ? menu.role : "GUEST",
+      role: isValidRole(menu.role) ? menu.role : "GUEST",
       order: menu.order,
     };
   }

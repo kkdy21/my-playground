@@ -8,14 +8,29 @@
 
 import { createKeyValidator } from "@/types/keyTypeValidator";
 
-export const Roles = {
-  ADMIN: "admin",
-  USER: "user",
-  GUEST: "guest",
+export const ROLES = {
+  ADMIN: "ADMIN",
+  USER: "USER",
+  GUEST: "GUEST",
 } as const;
 
-export type RoleKey = keyof typeof Roles;
-export type RoleValue = (typeof Roles)[RoleKey];
+export const ROLES_WITH_ALL = {
+  ...ROLES,
+  ALL: "ALL",
+} as const;
+
+export const ROLES_LABEL = {
+  [ROLES.ADMIN]: "관리자",
+  [ROLES.USER]: "사용자",
+  [ROLES.GUEST]: "게스트",
+  [ROLES_WITH_ALL.ALL]: "모든 권한",
+} as const;
+
+export type Roles = (typeof ROLES_WITH_ALL)[keyof typeof ROLES_WITH_ALL];
+export type RolesWithAll = (typeof ROLES_WITH_ALL)[keyof typeof ROLES_WITH_ALL];
 
 // Roles에 대한 유효성 검사기
-export const isValidRoleKey = createKeyValidator(Roles);
+export const isValidRole = createKeyValidator<typeof ROLES>(ROLES);
+export const getRoleLabel = (key: RolesWithAll) => {
+  return ROLES_LABEL[key];
+};

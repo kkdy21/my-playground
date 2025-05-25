@@ -1,55 +1,61 @@
-import type {AxiosError, AxiosInstance, CreateAxiosDefaults} from "axios";
+import type { AxiosError, AxiosInstance, CreateAxiosDefaults } from "axios";
 import axios from "axios";
-import {sessionStorageAccessor} from "./webStorage.ts";
+import { sessionStorageAccessor } from "./webStorage.ts";
 import JwtProvider from "./jwtProvider.ts";
 
 export default class ServiceAPI {
-    instance: AxiosInstance;
+  instance: AxiosInstance;
 
-    constructor(baseURL: string, settings: CreateAxiosDefaults = {}) {
-        this.instance = axios.create({
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            ...settings,
-            baseURL,
-        });
-        this.setAxiosInterceptors();
-    }
+  constructor(baseURL: string, settings: CreateAxiosDefaults = {}) {
+    this.instance = axios.create({
+      headers: {
+        "Content-Type": "application/json",
+      },
+      ...settings,
+      baseURL,
+    });
+    this.setAxiosInterceptors();
+  }
 
-    private setAxiosInterceptors(): void {
-        this.instance.interceptors.request.use((request) => {
-            if (typeof window !== 'undefined') {
-                const access_token = sessionStorageAccessor.getItem<string>('access_token');
-                request.headers.Authorization = `Bearer ${access_token}`;
-            }
-            return request;
-        });
+  private setAxiosInterceptors(): void {
+    this.instance.interceptors.request.use((request) => {
+      if (typeof window !== "undefined") {
+        const access_token =
+          sessionStorageAccessor.getItem<string>("access_token");
+        request.headers.Authorization = `Bearer ${access_token}`;
+      }
+      return request;
+    });
 
-        this.instance.interceptors.response.use(response => response, this.handleResponseError)
-    }
+    this.instance.interceptors.response.use(
+      (response) => response,
+      this.handleResponseError
+    );
+  }
 
-    private handleResponseError = async (error: AxiosError): Promise<any> => {
-        const originalRequest = error.config;
+  private handleResponseError = async (error: AxiosError): Promise<any> => {
+    const originalRequest = error.config;
 
-        if (error.response?.status === 401) {
-            if ((originalRequest as any)._retry) {
-                return Promise.reject(error);
-            }
-            (originalRequest as any)._retry = true;
+    if (error.response?.status === 401) {
+      if ((originalRequest as any)._retry) {
+        return Promise.reject(error);
+      }
+      (originalRequest as any)._retry = true;
 
-            try {
-                const refreshed = await JwtProvider.getProvider().refreshTokens();
-                if (refreshed){
-                    originalRequest!.headers.Authorization = `Bearer ${JwtProvider.getProvider().getTokens().access_token}`;
-                    return this.instance((originalRequest as any));
-                }
-            } catch (e) {
-                console.debug(e);
-                alert('User Session Expired.\n Pleas login again');
-                //TODO login 화면으로 전환
-                return Promise.reject(e);
-            }
+      try {
+        const refreshed = await JwtProvider.getProvider().refreshTokens();
+        if (refreshed) {
+          originalRequest!.headers.Authorization = `Bearer ${
+            JwtProvider.getProvider().getTokens().access_token
+          }`;
+          return this.instance(originalRequest as any);
         }
+      } catch (e) {
+        console.debug(e);
+        alert("User Session Expired.\n Pleas login again");
+        //TODO login 화면으로 전환
+        return Promise.reject(e);
+      }
     }
+  };
 }

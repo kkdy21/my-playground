@@ -1,4 +1,4 @@
-import type { RoleKey } from "@/repositories/menuRepository/constants";
+import type { Roles } from "@/repositories/menuRepository/constants";
 
 export type MenuEntity = {
   id: string;
@@ -6,6 +6,6 @@ export type MenuEntity = {
   path: string;
   icon: string;
   children: MenuEntity[];
-  role: RoleKey;
+  role: Roles;
   order: number;
 };
