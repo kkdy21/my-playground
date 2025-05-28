@@ -3,25 +3,18 @@
 import { type SetupWorker, setupWorker } from "msw/browser";
 import type { RequestHandler } from "msw";
 import { localStorageAccessor, STORAGE_KEYS } from "../webStorage"; // webStorage.ts 경로에 맞게 수정 필요
-import { allMockHandlerInfoGroups } from "./mswHandlers"; //
+import { allMockHandlerInfoGroups, initialHandlerStates } from "./mswHandlers"; //
 import type { MockHandlerInfo } from "@/libs/msw/types"; // msw.d.ts 경로에 맞게 수정 필요
-import { BOOKMARK_HANDLER_IDS } from "@/repositories/bookmarkRepository/mock/bookmarkMockhandler"; //
-import { MENU_HANDLER_IDS } from "@/repositories/menuRepository/mock/menuMockhandler"; //
 import type { HandlerEnabledState } from "@/types/msw";
 
-//FIXME allMockHandlerInfoGroups와 연관성 생각해야함. allMockHandlerInfoGroups에 정의안되어있고 여기에만 정의되어있을수도있으므로
-// allMockHandlerInfoGroups의 존재이유를 다시 생각해봐야함.
+/*
+  1. group별 enabled 상태 관리
+  2. 각 handler별 enabled 상태 관리
+  3. 전체 enabled 상태관리
+  4. handler 목록 조회시 group 기준 handler 나열 방식으로 변경
+*/
 
 // --- 초기 핸들러 상태 정의 --- //FIXME 초기 상태 정의 방법 고민 -> mock 파일별로 관리 방법으로 전환.
-const initialHandlerStates: HandlerEnabledState = {
-  [BOOKMARK_HANDLER_IDS.GET_BOOKMARK_BY_ID]: true,
-  [BOOKMARK_HANDLER_IDS.CREATE_BOOKMARK]: true,
-  [BOOKMARK_HANDLER_IDS.UPDATE_BOOKMARK]: true,
-  [BOOKMARK_HANDLER_IDS.DELETE_BOOKMARK]: true,
-  [BOOKMARK_HANDLER_IDS.GET_BOOKMARKS]: true,
-  [MENU_HANDLER_IDS.GET_MENU_LIST]: true,
-  // 추가 핸들러 ID와 초기 상태
-};
 
 class MSWController {
   private worker: SetupWorker | null = null;
@@ -158,13 +151,12 @@ class MSWController {
 
     Object.entries(allMockHandlerInfoGroups).forEach(
       ([groupName, handlers]) => {
-        //
         Object.values(handlers).forEach((handlerInfo) => {
           details.push({
             groupName,
             id: handlerInfo.id,
             description: handlerInfo.description,
-            isEnabled:
+            enabled:
               typeof sourceConfig[handlerInfo.id] === "boolean"
                 ? sourceConfig[handlerInfo.id]
                 : initialHandlerStates[handlerInfo.id] || false,
@@ -295,6 +287,7 @@ class MSWController {
         await this.reinitialize();
         console.log(`[MSW Control] MSW 재초기화 완료.`);
       },
+
       isHandlerEnabled: (handlerId: string) => {
         if (!this.configInitialized) {
           this.initializeRuntimeConfig();
@@ -331,7 +324,7 @@ class MSWController {
         details.forEach((detail) => {
           console.log(
             `  - ${detail.id.padEnd(15, " ")} | ${
-              detail.isEnabled ? "ON " : "OFF"
+              detail.enabled ? "ON " : "OFF"
             } | ${detail.description} (그룹: ${detail.groupName})`
           );
         });

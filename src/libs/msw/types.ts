@@ -4,11 +4,19 @@ export interface MockHandlerInfo {
   groupName: string;
   id: string;
   description: string;
-  isEnabled: boolean;
+  enabled: boolean;
 }
 
 export interface MockHandlerItem {
   id: string;
   description: string;
   handler: RequestHandler;
+}
+
+export interface MockHandlerGroup {
+  groupName: string;
+  id: string;
+  description: string;
+  enabled: boolean;
+  handlers: Record<string, MockHandlerItem>;
 }

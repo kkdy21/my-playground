@@ -12,7 +12,6 @@ export const BOOKMARK_HANDLER_IDS = {
   DELETE_BOOKMARK: "bm_delete",
 } as const;
 
-// 핸들러 정보 인터페이스 (공통 사용 가능하도록 msw.d.ts 등으로 옮겨도 무방)
 export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
   [BOOKMARK_HANDLER_IDS.GET_BOOKMARKS]: {
     id: BOOKMARK_HANDLER_IDS.GET_BOOKMARKS,

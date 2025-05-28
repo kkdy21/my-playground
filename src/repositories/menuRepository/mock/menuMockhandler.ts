@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type { MenuDTO } from "../schema/dto/menuDTO";
-import type { MockHandlerItem } from "@/libs/msw/types";
+import type { MockHandlerItem, MockHandlerGroup } from "@/libs/msw/types";
 
 /*
   개별 핸들러에 ID를 부여하고 객체형태로 관리.
@@ -38,6 +38,14 @@ export const menuMockHandlers: Record<string, MockHandlerItem> = {
       ]);
     }),
   },
+};
+
+export const menuMockHandlerGroup: MockHandlerGroup = {
+  groupName: "menu",
+  id: "menu",
+  description: "메뉴~",
+  enabled: true,
+  handlers: menuMockHandlers,
 };
 
 // post에 관한 typescript
