@@ -17,6 +17,7 @@ declare global {
       loadConfigFromLocalStorage: () => Promise<void>;
       resetToInitialCodeConfig: () => Promise<void>;
       isWorkerRunning: () => boolean;
+      help: () => void;
     };
   }
 }
