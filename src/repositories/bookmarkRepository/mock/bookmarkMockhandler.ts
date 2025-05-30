@@ -1,15 +1,18 @@
 // src/repositories/bookmarkRepository/mock/bookmarkMockhandler.ts
 import type { BookmarkDTO } from "@/repositories/bookmarkRepository/schema/dto/bookmarkDTO";
-import type { MockHandlerItem } from "@/libs/msw/types";
+import type { MockHandlerGroup, MockHandlerItem } from "@/libs/msw/types";
 import { http, HttpResponse } from "msw";
+import { BOOKMARK_TYPE } from "../constants";
 
 // 핸들러 ID 상수 정의
-export const BOOKMARK_HANDLER_IDS = {
-  GET_BOOKMARKS: "bm_list", // bookmarks_get_list -> bm_list (짧게 변경)
-  GET_BOOKMARK_BY_ID: "bm_get_by_id",
-  CREATE_BOOKMARK: "bm_create",
-  UPDATE_BOOKMARK: "bm_update",
-  DELETE_BOOKMARK: "bm_delete",
+const BOOKMARK_GROUP_NAME = "bookmark";
+
+const BOOKMARK_HANDLER_IDS = {
+  GET_BOOKMARKS: `${BOOKMARK_GROUP_NAME}_list`, // bookmarks_get_list -> bm_list (짧게 변경)
+  GET_BOOKMARK_BY_ID: `${BOOKMARK_GROUP_NAME}_get_by_id`,
+  CREATE_BOOKMARK: `${BOOKMARK_GROUP_NAME}_create`,
+  UPDATE_BOOKMARK: `${BOOKMARK_GROUP_NAME}_update`,
+  DELETE_BOOKMARK: `${BOOKMARK_GROUP_NAME}_delete`,
 } as const;
 
 export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
@@ -33,6 +36,7 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
           tags: ["msw", "tool"],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          type: BOOKMARK_TYPE.ADMIN,
         },
         {
           id: "2",
@@ -42,6 +46,7 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
           tags: ["react", "data"],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          type: BOOKMARK_TYPE.USER,
         },
       ];
       return HttpResponse.json(mockBookmarks);
@@ -50,7 +55,6 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
   [BOOKMARK_HANDLER_IDS.GET_BOOKMARK_BY_ID]: {
     id: BOOKMARK_HANDLER_IDS.GET_BOOKMARK_BY_ID,
     description: "GET /api/bookmarks/:bookMark_id (북마크 상세)",
-    //FIXME path 파라미터도 이렇게 쓰는게 맞나? 포함해서 적어야하는게 맞나.
     handler: http.get("/api/bookmarks/:bookMark_id", ({ params }) => {
       const { bookMark_id } = params;
       console.log(`[MSW] Mocking GET /api/bookmarks/${bookMark_id}`);
@@ -122,4 +126,11 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
       return new HttpResponse(null, { status: 204 }); // 성공적으로 삭제됨 (No Content)
     }),
   },
+};
+
+export const bookmarkMockHandlerGroup: MockHandlerGroup = {
+  groupName: BOOKMARK_GROUP_NAME,
+  id: "bookmark",
+  description: "북마크 관련 핸들러",
+  handlers: bookmarkMockHandlers,
 };

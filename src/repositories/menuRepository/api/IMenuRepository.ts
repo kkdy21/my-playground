@@ -1,6 +1,7 @@
 import type { MenuDTO } from "@/repositories/menuRepository/schema/dto/menuDTO";
 import type { AxiosResponse } from "axios";
-//TODO MSW 적용후 사용할지 검토
+import type { GetMenuParameters } from "../schema/api-verbs/get";
+
 export interface IMenuRepository {
-  getMenuList(): Promise<AxiosResponse<MenuDTO[]>>;
+  getMenuList(query?: GetMenuParameters): Promise<AxiosResponse<MenuDTO[]>>;
 }

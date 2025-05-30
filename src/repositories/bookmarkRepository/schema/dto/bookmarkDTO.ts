@@ -6,4 +6,5 @@ export type BookmarkDTO = {
   tags: string[];
   createdAt: string;
   updatedAt: string;
+  type: string;
 };
