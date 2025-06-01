@@ -4,8 +4,8 @@ import ServiceAPI from "../libs/serviceAPI.ts";
 export default class BaseRepository {
   private serviceAPI: ServiceAPI;
 
-  constructor(baseURL: string = "http://localhost:5173") {
-    this.serviceAPI = new ServiceAPI(baseURL);
+  constructor() {
+    this.serviceAPI = new ServiceAPI();
   }
 
   protected async get<T>(url: string): Promise<AxiosResponse<T>> {

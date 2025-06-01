@@ -9,6 +9,8 @@ import type {
 } from "@/libs/msw/types";
 import type { HandlerEnabledState } from "@/types/msw";
 
+const IS_DEVELOPMENT = import.meta.env.MODE === "development";
+
 class MSWController {
   private worker: SetupWorker | null = null;
   private runtimeHandlerConfig: HandlerEnabledState = {
@@ -18,16 +20,16 @@ class MSWController {
   private mswWorkerStarted = false; // 순수 MSW 워커 시작 여부
 
   constructor() {
-    // 개발 환경에서만 window.mswControl 설정
-    if (process.env.NODE_ENV === "development") {
-      this.initializeRuntimeConfig(); // 생성자에서 설정 초기화
+    // 개발 환경과 스테이징 환경에서만 MSW 활성화
+    if (IS_DEVELOPMENT) {
+      this.initializeRuntimeConfig();
       this.exposeControlToWindow();
     }
   }
 
   // --- 설정 관리 로직  ---
   private initializeRuntimeConfig(): void {
-    if (this.configInitialized || process.env.NODE_ENV !== "development") {
+    if (this.configInitialized || !IS_DEVELOPMENT) {
       return;
     }
 
@@ -75,7 +77,7 @@ class MSWController {
   }
 
   private isHandlerEnabled(handlerId: string): boolean {
-    if (process.env.NODE_ENV !== "development") return false;
+    if (!IS_DEVELOPMENT) return false;
     // configInitialized 체크는 생성자에서 initializeRuntimeConfig를 호출하므로,
     // 대부분의 공개 메서드 호출 시점에는 true일 것으로 예상됨.
     // 만약 초기화 전 접근 시도를 더 엄격히 제어하려면 각 공개 메서드 시작 시 체크.
@@ -91,7 +93,7 @@ class MSWController {
   }
 
   private setHandlerEnabled(handlerId: string, enabled: boolean): void {
-    if (process.env.NODE_ENV !== "development") return;
+    if (!IS_DEVELOPMENT) return;
     if (!this.configInitialized) {
       console.warn(
         "[MSW Controller] 아직 초기화되지 않아 설정을 변경할 수 없습니다."
@@ -115,7 +117,7 @@ class MSWController {
 
   private getConfiguredRequestHandlers(): RequestHandler[] {
     const activeRequestHandlers: RequestHandler[] = [];
-    if (process.env.NODE_ENV !== "development") return activeRequestHandlers;
+    if (!IS_DEVELOPMENT) return activeRequestHandlers;
     if (!this.configInitialized) {
       console.warn(
         "[MSW Controller] 아직 초기화되지 않아 핸들러 목록을 가져올 수 없습니다."
@@ -135,7 +137,7 @@ class MSWController {
 
   private _getAllHandlerDetailsForConsole(): MockHandlerInfo[] {
     const details: MockHandlerInfo[] = [];
-    if (process.env.NODE_ENV !== "development") return details;
+    if (!IS_DEVELOPMENT) return details;
 
     const isEnabled = (groupName: string, handlerId: string): boolean => {
       const group = mockHandlerGroups[groupName];
@@ -179,7 +181,7 @@ class MSWController {
       return;
     }
 
-    if (process.env.NODE_ENV === "development") {
+    if (IS_DEVELOPMENT) {
       // initializeRuntimeConfig는 생성자에서 호출되므로 여기서는 ensure 정도로만.
       if (!this.configInitialized) this.initializeRuntimeConfig();
 
@@ -226,7 +228,7 @@ class MSWController {
   }
 
   async reinitialize(): Promise<void> {
-    if (process.env.NODE_ENV !== "development") return;
+    if (!IS_DEVELOPMENT) return;
     console.log("[MSW Controller] 워커 재초기화 중...");
     await this.stop();
     await this.start(); // 내부적으로 getConfiguredRequestHandlers를 호출하여 최신 설정 반영
@@ -246,7 +248,7 @@ class MSWController {
 
   // --- 콘솔 인터페이스 노출 로직 ---
   private exposeControlToWindow(): void {
-    if (process.env.NODE_ENV !== "development") return;
+    if (!IS_DEVELOPMENT) return;
 
     const mswControlObject = {
       enableHandler: async (handlerId: string) => {
@@ -455,7 +457,7 @@ class MSWController {
         return running;
       },
       help: () => {
-        if (process.env.NODE_ENV === "development") {
+        if (IS_DEVELOPMENT) {
           console.log("--- MSW 개발 모드 안내 ---");
           console.log(
             "개발자 콘솔에서 'mswControl' 객체를 사용하여 모킹 핸들러를 제어할 수 있습니다."

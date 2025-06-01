@@ -18,7 +18,7 @@
 * **개발 환경 전용**: MSW는 개발 환경(`process.env.NODE_ENV === 'development'`)에서만 활성화됩니다.
 * **동적 핸들러 제어**: 브라우저 개발자 콘솔(`window.mswControl`)을 통해 각 API 모킹 핸들러를 실시간으로 제어할 수 있습니다.
 * **설정 유지**: 핸들러 활성화 상태는 `localStorage`에 저장되어 세션 간 유지가 가능합니다.
-* **Repository 연동**: MSW 핸들러는 각 Repository의 API 호출 경로 및 응답 형식을 모방하여 설계됩니다. (예: `bookmarkMockhandler.ts`는 `bookmarkRepository`의 API를 모킹)
+* **Repository 모방**: MSW 핸들러는 각 Repository의 API 호출 경로 및 응답 형식을 모방하여 설계됩니다. (예: `bookmarkMockhandler.ts`는 `bookmarkRepository`의 API를 모킹)
 * **독립적인 프론트엔드 개발**: 백엔드 API 개발 진행 상황에 관계없이 UI 개발 및 테스트를 진행할 수 있습니다.
 * **다양한 시나리오 테스트**: 성공, 실패, 특정 에러 상황 등 다양한 API 응답 시나리오를 손쉽게 시뮬레이션할 수 있습니다.
 

@@ -6,7 +6,10 @@ import JwtProvider from "./jwtProvider.ts";
 export default class ServiceAPI {
   instance: AxiosInstance;
 
-  constructor(baseURL: string, settings: CreateAxiosDefaults = {}) {
+  constructor(
+    baseURL: string = import.meta.env.VITE_BACKEND_BASE_URL,
+    settings: CreateAxiosDefaults = {}
+  ) {
     this.instance = axios.create({
       headers: {
         "Content-Type": "application/json",

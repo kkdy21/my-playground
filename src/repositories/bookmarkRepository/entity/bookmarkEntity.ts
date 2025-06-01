@@ -34,4 +34,7 @@ export class BookmarkEntity {
     }
     return BOOKMARK_TYPE.USER;
   }
+  get dto(): BookmarkDTO {
+    return this._dto;
+  }
 }

@@ -32,4 +32,7 @@ export class MenuEntity {
   get order(): number {
     return this._dto.order;
   }
+  get dto(): MenuDTO {
+    return this._dto;
+  }
 }

@@ -5,11 +5,29 @@ import path from "path";
 // https://vite.dev/config/
 export default ({ command, mode }: ConfigEnv) => {
   const env = loadEnv(mode, process.cwd(), "");
+  const apiServerDomain = env.VITE_BACKEND_BASE_URL;
 
-  console.log(command, mode);
-  console.log(env);
+  if (command === "serve") {
+    console.log(` -----------------------------------------------------------`);
+    console.log(`  Command   | ${command}`);
+    console.log(`  Vite mode | ${mode}`);
+    console.log(`  API Server | ${apiServerDomain}`);
+    console.log(` -----------------------------------------------------------`);
+  }
 
   return defineConfig({
+    server: {
+      proxy: {
+        "/api": {
+          target: apiServerDomain,
+          changeOrigin: true,
+          secure: true,
+          headers: {
+            Origin: apiServerDomain,
+          },
+        },
+      },
+    },
     plugins: [react()],
     resolve: {
       alias: {
