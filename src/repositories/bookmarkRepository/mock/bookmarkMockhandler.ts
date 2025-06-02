@@ -15,11 +15,13 @@ const BOOKMARK_HANDLER_IDS = {
   DELETE_BOOKMARK: `${BOOKMARK_GROUP_NAME}_delete`,
 } as const;
 
+const baseUrl = import.meta.env.VITE_BACKEND_ENDPOINT || "";
+
 export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
   [BOOKMARK_HANDLER_IDS.GET_BOOKMARKS]: {
     id: BOOKMARK_HANDLER_IDS.GET_BOOKMARKS,
     description: "GET /api/bookmarks (북마크 목록)",
-    handler: http.get("/api/bookmarks", ({ request }) => {
+    handler: http.get(`${baseUrl}/api/bookmarks`, ({ request }) => {
       const url = new URL(request.url);
       const tag = url.searchParams.get("tag");
       const search = url.searchParams.get("search");
@@ -55,7 +57,7 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
   [BOOKMARK_HANDLER_IDS.GET_BOOKMARK_BY_ID]: {
     id: BOOKMARK_HANDLER_IDS.GET_BOOKMARK_BY_ID,
     description: "GET /api/bookmarks/:bookMark_id (북마크 상세)",
-    handler: http.get("/api/bookmarks/:bookMark_id", ({ params }) => {
+    handler: http.get(`${baseUrl}/api/bookmarks/:bookMark_id`, ({ params }) => {
       const { bookMark_id } = params;
       console.log(`[MSW] Mocking GET /api/bookmarks/${bookMark_id}`);
       if (bookMark_id === "1") {
@@ -75,7 +77,7 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
   [BOOKMARK_HANDLER_IDS.CREATE_BOOKMARK]: {
     id: BOOKMARK_HANDLER_IDS.CREATE_BOOKMARK,
     description: "POST /api/bookmarks (북마크 생성)",
-    handler: http.post("/api/bookmarks", async ({ request }) => {
+    handler: http.post(`${baseUrl}/api/bookmarks`, async ({ request }) => {
       const newBookmark = (await request.json()) as Omit<
         BookmarkDTO,
         "id" | "createdAt" | "updatedAt"
@@ -94,7 +96,7 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
     id: BOOKMARK_HANDLER_IDS.UPDATE_BOOKMARK,
     description: "PUT /api/bookmarks/:bookmarkId (북마크 수정)",
     handler: http.put(
-      "/api/bookmarks/:bookmarkId",
+      `${baseUrl}/api/bookmarks/:bookmarkId`,
       async ({ params, request }) => {
         const { bookmarkId } = params;
         const updatedData = (await request.json()) as Partial<
@@ -120,7 +122,7 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
   [BOOKMARK_HANDLER_IDS.DELETE_BOOKMARK]: {
     id: BOOKMARK_HANDLER_IDS.DELETE_BOOKMARK,
     description: "DELETE /api/bookmarks/:id (북마크 삭제)",
-    handler: http.delete("/api/bookmarks/:id", ({ params }) => {
+    handler: http.delete(`${baseUrl}/api/bookmarks/:id`, ({ params }) => {
       const { id } = params;
       console.log(`[MSW] Mocking DELETE /api/bookmarks/${id}`);
       return new HttpResponse(null, { status: 204 }); // 성공적으로 삭제됨 (No Content)

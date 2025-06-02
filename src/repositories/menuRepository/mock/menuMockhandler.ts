@@ -5,17 +5,20 @@ import type { MockHandlerItem, MockHandlerGroup } from "@/libs/msw/types";
 /*
   개별 핸들러에 ID를 부여하고 객체형태로 관리.
 */
+
 const MENU_GROUP_NAME = "menu";
 
 const MENU_HANDLER_IDS = {
   GET_MENU_LIST: `${MENU_GROUP_NAME}_list`,
 } as const;
 
+const baseUrl = import.meta.env.VITE_BACKEND_ENDPOINT || "";
+
 export const menuMockHandlers: Record<string, MockHandlerItem> = {
   [MENU_HANDLER_IDS.GET_MENU_LIST]: {
     id: MENU_HANDLER_IDS.GET_MENU_LIST,
     description: "메뉴 목록 조회",
-    handler: http.get("/api/menu", (): HttpResponse<MenuDTO[]> => {
+    handler: http.get(`${baseUrl}/api/menu`, (): HttpResponse<MenuDTO[]> => {
       console.log("[MSW] Mocking GET /api/menu");
       return HttpResponse.json([
         {

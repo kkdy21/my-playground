@@ -9,7 +9,7 @@ interface IJwt {
   refresh_token: string;
 }
 
-const url = import.meta.env.VITE_BACKEND_ENDPOINT;
+const baseUrl = import.meta.env.VITE_BACKEND_ENDPOINT;
 
 export default class JwtProvider {
   private static tokenProvider: JwtProvider | null = null;
@@ -74,7 +74,7 @@ export default class JwtProvider {
     this.lock = (async (): Promise<boolean> => {
       try {
         const refreshRes = await axios.post(
-          `${url}/${this.REFRESH_TOKEN_URL}`,
+          `${baseUrl}/${this.REFRESH_TOKEN_URL}`,
           {
             request: {
               refresh_token: this.refresh_token,
