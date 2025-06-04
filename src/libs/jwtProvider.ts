@@ -2,7 +2,7 @@ import axios from "axios";
 import type { StorageConnector } from "./webStorage.ts";
 import { localStorageAccessor, sessionStorageAccessor } from "./webStorage.ts";
 import { isNullOrUndefined } from "../utils/isNullOrUndefined.ts";
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode, type JwtPayload } from "jwt-decode";
 
 interface IJwt {
   access_token: string;
@@ -104,7 +104,7 @@ export default class JwtProvider {
   }
 
   parseAccessToken() {
-    let decodedToken: any = {};
+    let decodedToken: JwtPayload = {};
     try {
       decodedToken = jwtDecode(this.access_token);
     } catch (e) {
