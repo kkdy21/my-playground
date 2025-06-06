@@ -1,0 +1,11 @@
+{
+  "name": "@dy/tsconfig",
+  "version": "0.1.0",
+  "private": true,
+  "author": "dy ko",
+  "files": [
+    "base.json",
+    "node.json",
+    "react-app.json"
+  ]
+}
