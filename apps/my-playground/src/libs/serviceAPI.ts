@@ -1,7 +1,7 @@
 import type { AxiosError, AxiosInstance, CreateAxiosDefaults } from "axios";
 import axios from "axios";
-import { sessionStorageAccessor } from "./webStorage.ts";
-import JwtProvider from "./jwtProvider.ts";
+import { sessionStorageAccessor } from "@/libs/webStorage.ts";
+import JwtProvider from "@/libs/jwtProvider.ts";
 
 export default class ServiceAPI {
   instance: AxiosInstance;

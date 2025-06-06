@@ -12,7 +12,7 @@ const MENU_HANDLER_IDS = {
   GET_MENU_LIST: `${MENU_GROUP_NAME}_list`,
 } as const;
 
-const baseUrl = import.meta.env.VITE_BACKEND_ENDPOINT || "";
+const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL || "";
 
 export const menuMockHandlers: Record<string, MockHandlerItem> = {
   [MENU_HANDLER_IDS.GET_MENU_LIST]: {

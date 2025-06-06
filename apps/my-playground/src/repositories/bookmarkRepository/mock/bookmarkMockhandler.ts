@@ -15,7 +15,7 @@ const BOOKMARK_HANDLER_IDS = {
   DELETE_BOOKMARK: `${BOOKMARK_GROUP_NAME}_delete`,
 } as const;
 
-const baseUrl = import.meta.env.VITE_BACKEND_ENDPOINT || "";
+const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL || "";
 
 export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
   [BOOKMARK_HANDLER_IDS.GET_BOOKMARKS]: {

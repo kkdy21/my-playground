@@ -9,7 +9,7 @@ interface IJwt {
   refresh_token: string;
 }
 
-const baseUrl = import.meta.env.VITE_BACKEND_ENDPOINT;
+const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
 export default class JwtProvider {
   private static tokenProvider: JwtProvider | null = null;

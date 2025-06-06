@@ -10,7 +10,7 @@ class MenuRepository extends BaseRepository implements IMenuRepository {
     query?: GetMenuParameters
   ): Promise<AxiosResponse<MenuDTO[]>> {
     const queryString = query ? qs.stringify(query) : "";
-    return this.get<MenuDTO[]>(`/api/menu?${queryString}`);
+    return this.get<MenuDTO[]>(`/api/menu${queryString}`);
   }
 }
 
