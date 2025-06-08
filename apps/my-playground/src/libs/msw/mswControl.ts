@@ -240,6 +240,10 @@ class MSWController {
         "[MSW Controller] 재초기화 후 워커가 시작되지 않음 (활성화된 핸들러가 없을 수 있음)."
       );
     }
+    
+    // MSW 상태가 변경되었음을 window에 알립니다.DevTools 확장이 이 이벤트를 수신합니다.
+    console.log("[MSW Controller] 'mswStateChanged' 이벤트를 브로드캐스트합니다.");
+    window.dispatchEvent(new CustomEvent("mswStateChanged"));
   }
 
   isWorkerRunning(): boolean {
@@ -455,6 +459,12 @@ class MSWController {
         const running = this.isWorkerRunning(); // 클래스 내부 메서드 사용
         console.log(`[MSW Control] 워커 실행 상태: ${running}`);
         return running;
+      },
+      getHandlers: (): MockHandlerInfo[] => {
+        if (!this.configInitialized) {
+          this.initializeRuntimeConfig();
+        }
+        return this._getAllHandlerDetailsForConsole();
       },
       help: () => {
         if (IS_DEVELOPMENT) {
