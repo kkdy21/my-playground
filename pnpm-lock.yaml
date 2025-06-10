@@ -84,14 +84,15 @@ importers:
       globals:
         specifier: ^15.15.0
         version: 15.15.0
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
       typescript-eslint:
         specifier: ^8.24.1
         version: 8.33.1(eslint@9.28.0)(typescript@5.7.3)
 
-  packages/tsconfig: {}
+  packages/tsconfig:
+    devDependencies:
+      typescript:
+        specifier: ~5.6.2
+        version: 5.6.3
 
 packages:
 
@@ -1768,6 +1769,11 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <5.9.0'
+
+  typescript@5.6.3:
+    resolution: {integrity: sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
 
   typescript@5.7.3:
     resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
@@ -3697,6 +3703,8 @@ snapshots:
       typescript: 5.7.3
     transitivePeerDependencies:
       - supports-color
+
+  typescript@5.6.3: {}
 
   typescript@5.7.3: {}
 

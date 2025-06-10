@@ -7,7 +7,7 @@ function App() {
   console.log(data);
 
   useEffect(() => {
-    window.mswControl?.help();
+    // window.mswControl?.help();
   }, []);
 
   return <></>;
