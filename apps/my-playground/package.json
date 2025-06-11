@@ -32,7 +32,8 @@
     "@types/qs": "^6.9.17",
     "vite": "^6.2.0",
     "@dy/eslint-config-custom": "workspace:*",
-    "@dy/tsconfig": "workspace:*"
+    "@dy/tsconfig": "workspace:*",
+    "msw-controller": "^1.0.0"
   },
   "msw": {
     "workerDirectory": [

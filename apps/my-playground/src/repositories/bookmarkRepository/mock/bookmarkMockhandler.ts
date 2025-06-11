@@ -1,6 +1,6 @@
 // src/repositories/bookmarkRepository/mock/bookmarkMockhandler.ts
 import type { BookmarkDTO } from "@/repositories/bookmarkRepository/schema/dto/bookmarkDTO";
-import type { MockHandlerGroup, MockHandlerItem } from "@/libs/msw/types";
+import type { MockHandlerGroup, MockHandlerItem } from "msw-controller";
 import { http, HttpResponse } from "msw";
 import { BOOKMARK_TYPE } from "../constants";
 

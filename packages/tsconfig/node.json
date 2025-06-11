@@ -1,8 +1,10 @@
 {
   "extends": "./base.json",
-  "module": "ESNext",
-  "moduleResolution": "bundler",
-  "target": "ES2022",
-  "lib": ["ES2023"],
-  "noEmit": true
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "noEmit": true
+  }
 }
