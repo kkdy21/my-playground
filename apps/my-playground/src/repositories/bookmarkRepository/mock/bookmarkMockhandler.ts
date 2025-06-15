@@ -132,7 +132,6 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
 
 export const bookmarkMockHandlerGroup: MockHandlerGroup = {
   groupName: BOOKMARK_GROUP_NAME,
-  id: "bookmark",
   description: "북마크 관련 핸들러",
   handlers: bookmarkMockHandlers,
 };

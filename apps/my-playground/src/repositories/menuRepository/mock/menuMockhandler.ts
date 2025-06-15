@@ -16,7 +16,7 @@ const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL || "";
 export const menuMockHandlers: Record<string, MockHandlerItem> = {
   [MENU_HANDLER_IDS.GET_MENU_LIST]: {
     id: MENU_HANDLER_IDS.GET_MENU_LIST,
-    description: "메뉴 목록 조회",
+    description: "GET /api/menu (메뉴 목록 조회)",
     handler: http.get(`${baseUrl}/api/menu`, (): HttpResponse<MenuDTO[]> => {
       console.log("[MSW] Mocking GET /api/menu");
       return HttpResponse.json([
@@ -45,8 +45,7 @@ export const menuMockHandlers: Record<string, MockHandlerItem> = {
 
 export const menuMockHandlerGroup: MockHandlerGroup = {
   groupName: "menu",
-  id: "menu",
-  description: "메뉴~",
+  description: "메뉴 관련 핸들러",
   handlers: menuMockHandlers,
 };
 

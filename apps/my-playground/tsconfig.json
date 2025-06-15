@@ -7,5 +7,5 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "public/mockServiceWorker.js"]
+  "include": ["src/*", "public/mockServiceWorker.js"]
 }

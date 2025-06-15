@@ -8,5 +8,5 @@ const mockHandlerGroups = [menuMockHandlerGroup, bookmarkMockHandlerGroup];
 export const mswController = new MSWController({
   enabled: IS_DEVELOPMENT,
   handlerGroups: mockHandlerGroups,
-  logLevel: "ko",
+  logLevel: "en",
 });
