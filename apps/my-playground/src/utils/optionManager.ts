@@ -17,8 +17,8 @@ export function createOptionsManager<
 ): {
   OPTIONS: T;
   ID: { [K in T[number]["id"]]: K };
-  getOptionById: (id: T[number]["id"]) => T[number] | undefined;
-  getOptionByValue: (value: T[number]["value"]) => T[number] | undefined;
+  getOptionById: (id: T[number]["id"]) => T[number];
+  getOptionByValue: (value: T[number]["value"]) => T[number];
   isValidOptionId: (id: string) => id is T[number]["id"];
   isValidOptionValue: (value: string | number) => value is T[number]["value"];
   ALL_OPTION: A;
@@ -33,8 +33,8 @@ export function createOptionsManager<T extends OptionsArray>(
 ): {
   OPTIONS: T;
   ID: { [K in T[number]["id"]]: K };
-  getOptionById: (id: T[number]["id"]) => T[number] | undefined;
-  getOptionByValue: (value: T[number]["value"]) => T[number] | undefined;
+  getOptionById: (id: T[number]["id"]) => T[number];
+  getOptionByValue: (value: T[number]["value"]) => T[number];
   isValidOptionId: (id: string) => id is T[number]["id"];
   isValidOptionValue: (value: string | number) => value is T[number]["value"];
 };
