@@ -41,33 +41,42 @@ export function createOptionsManager<T extends OptionsArray>(
 
 // --- 함수 오버로딩 구현부 ---
 
-// 'any'를 사용하여 실제 구현 로직을 작성합니다.
-export function createOptionsManager(options: any, allOption?: any) {
-  const idToOptionMap = new Map(options.map((o: any) => [o.id, o]));
-  const valueToOptionMap = new Map(options.map((o: any) => [o.value, o]));
+// 'any'를 사용하여 실제 구현 로직을 작성할수도 있지만 복잡하지 않아서 타입 작성
+export function createOptionsManager<
+  T extends OptionsArray,
+  A extends BaseOption & { id: "ALL" }
+>(options: T, allOption?: A) {
+  const idToOptionMap = new Map<T[number]["id"], T[number]>(
+    options.map((o) => [o.id, o])
+  );
+  const valueToOptionMap = new Map<T[number]["value"], T[number]>(
+    options.map((o) => [o.value, o])
+  );
 
-  const ID = options.reduce((acc: any, option: any) => {
-    acc[option.id] = option.id;
-    return acc;
-  }, {});
+  const ID = Object.fromEntries(options.map((o) => [o.id, o.id])) as {
+    [K in T[number]["id"]]: K;
+  };
 
-  const manager = {
+  const baseManager = {
     OPTIONS: options,
     ID,
-    getOptionById: (id: any) => idToOptionMap.get(id),
-    getOptionByValue: (value: any) => valueToOptionMap.get(value),
-    isValidOptionId: (id: any) => idToOptionMap.has(id),
-    isValidOptionValue: (value: any) => valueToOptionMap.has(value),
+    getOptionById: (id: T[number]["id"]) => idToOptionMap.get(id),
+    getOptionByValue: (value: T[number]["value"]) =>
+      valueToOptionMap.get(value),
+    isValidOptionId: (id: string): id is T[number]["id"] =>
+      idToOptionMap.has(id as T[number]["id"]),
+    isValidOptionValue: (value: string | number): value is T[number]["value"] =>
+      valueToOptionMap.has(value as T[number]["value"]),
   };
 
   if (allOption) {
     return {
-      ...manager,
+      ...baseManager,
       ALL_OPTION: allOption,
       OPTIONS_WITH_ALL: [allOption, ...options],
       ID_WITH_ALL: { ...ID, [allOption.id]: allOption.id },
     };
   }
 
-  return manager;
+  return baseManager;
 }

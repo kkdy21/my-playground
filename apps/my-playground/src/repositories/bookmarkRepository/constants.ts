@@ -1,4 +1,4 @@
-import { createOptionsManager } from "@/utils/keyTypeValidator";
+import { createOptionsManager } from "@/utils/optionManager";
 
 /**
 * { id, value, label } 구조의 역할과 장점
