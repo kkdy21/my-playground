@@ -1,4 +1,4 @@
-import { createOptionsManager } from "../../utils/optionManager";
+import { createConstTypeManager } from "../../utils/constTypeManager";
 
 const ROLES = [
   { id: "ADMIN", value: "1", label: "관리자" },
@@ -12,4 +12,4 @@ const ROLES_ALL_OPTION = {
   label: "모든 권한",
 } as const;
 
-const ROLES_OPTIONS_MANAGER = createOptionsManager(ROLES, ROLES_ALL_OPTION);
+const ROLES_OPTIONS_MANAGER = createConstTypeManager(ROLES, ROLES_ALL_OPTION);
