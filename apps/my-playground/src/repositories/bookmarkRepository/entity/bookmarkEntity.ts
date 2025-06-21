@@ -1,5 +1,6 @@
-import { type BookmarkKey, isBookmarkType, BOOKMARK_TYPE } from "../constants";
 import type { BookmarkDTO } from "../schema/dto/bookmarkDTO";
+import { bookmarkTypeOptionsManager } from "../constants";
+import { BookmarkTypeId } from "../types";
 
 export class BookmarkEntity {
   constructor(private _dto: BookmarkDTO, public readonly index: number) {}
@@ -28,11 +29,11 @@ export class BookmarkEntity {
     return this._dto.description;
   }
 
-  get bookmarkType(): BookmarkKey {
-    if (isBookmarkType(this._dto.type)) {
-      return this._dto.type;
+  get bookmarkType(): BookmarkTypeId {
+    if (bookmarkTypeOptionsManager.isValidOptionValue(this._dto.type)) {
+      return bookmarkTypeOptionsManager.getOptionByValue(this._dto.type).id;
     }
-    return BOOKMARK_TYPE.USER;
+    return bookmarkTypeOptionsManager.ID.USER;
   }
   get dto(): BookmarkDTO {
     return this._dto;

@@ -1,7 +1,7 @@
 import { referenceRepository } from "../../referenceRepository.ts";
 import { useQuery } from "@tanstack/react-query";
-import type { BookmarkDTO } from "@/repositories/bookmarkRepository/schema/dto/bookmarkDTO";
-import { BookmarkEntity } from "@/repositories/bookmarkRepository/entity/bookmarkEntity";
+import { BookmarkEntity } from "../entity/bookmarkEntity";
+import { BookmarkDTO } from "../schema/dto/bookmarkDTO";
 
 // react query hook을 server state로 사용하는 방식을 채택, select함수를 통해 response를 model로 변환하는 방식생각.
 export const BOOKMARK_KEYS = {

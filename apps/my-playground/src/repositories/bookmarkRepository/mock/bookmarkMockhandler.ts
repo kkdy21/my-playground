@@ -2,7 +2,7 @@
 import type { BookmarkDTO } from "@/repositories/bookmarkRepository/schema/dto/bookmarkDTO";
 import type { MockHandlerGroup, MockHandlerItem } from "msw-controller";
 import { http, HttpResponse } from "msw";
-import { BOOKMARK_TYPE } from "../constants";
+import { bookmarkTypeOptionsManager } from "../constants";
 
 // 핸들러 ID 상수 정의
 const BOOKMARK_GROUP_NAME = "bookmark";
@@ -38,7 +38,7 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
           tags: ["msw", "tool"],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          type: BOOKMARK_TYPE.ADMIN,
+          type: bookmarkTypeOptionsManager.ID.ADMIN,
         },
         {
           id: "2",
@@ -48,7 +48,7 @@ export const bookmarkMockHandlers: Record<string, MockHandlerItem> = {
           tags: ["react", "data"],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          type: BOOKMARK_TYPE.USER,
+          type: bookmarkTypeOptionsManager.ID.USER,
         },
       ];
       return HttpResponse.json(mockBookmarks);

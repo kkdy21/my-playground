@@ -39,7 +39,7 @@ type OptionsArray = readonly BaseOption[];
 
 // 시그니처 1: 'allOption'이 제공된 경우의 반환 타입을 정의합니다.
 // ('ID_WITH_ALL' 등이 필수로 포함됩니다.)
-export function createConstTypeManager<
+export function createConstOptionsManager<
   T extends OptionsArray,
   A extends BaseOption & { id: "ALL" }
 >(
@@ -59,7 +59,7 @@ export function createConstTypeManager<
 
 // 시그니처 2: 'allOption'이 제공되지 않은 경우의 반환 타입을 정의합니다.
 // ('ID_WITH_ALL' 등이 포함되지 않습니다.)
-export function createConstTypeManager<T extends OptionsArray>(
+export function createConstOptionsManager<T extends OptionsArray>(
   options: T
 ): {
   OPTIONS: T;
@@ -73,7 +73,7 @@ export function createConstTypeManager<T extends OptionsArray>(
 // --- 함수 오버로딩 구현부 ---
 
 // 'any'를 사용하여 실제 구현 로직을 작성할수도 있지만 복잡하지 않아서 타입 작성
-export function createConstTypeManager<
+export function createConstOptionsManager<
   T extends OptionsArray,
   A extends BaseOption & { id: "ALL" }
 >(options: T, allOption?: A) {
